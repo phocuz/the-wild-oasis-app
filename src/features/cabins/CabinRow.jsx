@@ -1,4 +1,6 @@
+//import React from 'react'
 import styled from "styled-components";
+import {formatCurrency} from "../../utils/helpers"
 
 const TableRow = styled.div`
   display: grid;
@@ -15,7 +17,7 @@ const TableRow = styled.div`
 const Img = styled.img`
   display: block;
   width: 6.4rem;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 3 /2 ;
   object-fit: cover;
   object-position: center;
   transform: scale(1.5) translateX(-7px);
@@ -38,3 +40,27 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
+const Delete = styled.div`
+  background-color: var(--color-grey-200);
+  padding: 8px;
+  text-align: center;
+  cursor: pointer;
+
+`
+
+export default function CabinRow({cabin}) {
+
+  const cabinData = cabin;
+
+  const {name,maxCapacity,regularPrice,image,discount,} = cabinData;
+  return (
+    <TableRow role="row">
+      <img src={image} alt="cabin-image" />
+      <Cabin>{name}</Cabin>
+      <div>Fits up to {maxCapacity} guests</div>
+      <Price>{formatCurrency(regularPrice)}</Price>
+      <Discount>{formatCurrency(discount)}</Discount>
+      <Delete>Delete</Delete>
+    </TableRow>
+  )
+}

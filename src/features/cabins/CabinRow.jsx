@@ -1,6 +1,11 @@
 //import React from 'react'
 import styled from "styled-components";
 import {formatCurrency} from "../../utils/helpers"
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteCabin } from "../../services/apiCabins";
+import toast from "react-hot-toast";
+import { useState } from "react";
+import CreateCabinForm from "./CreateCabinForm";
 
 const TableRow = styled.div`
   display: grid;
@@ -40,7 +45,7 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
-const Delete = styled.div`
+const Delete = styled.button`
   background-color: var(--color-grey-200);
   padding: 8px;
   text-align: center;
@@ -50,17 +55,47 @@ const Delete = styled.div`
 
 export default function CabinRow({cabin}) {
 
+  const [showForm, setShowForm] = useState(false)
   const cabinData = cabin;
+  // console.log('Cabin data:', cabin);
+  const {name, maxCapacity, id:cabinId, regularPrice, image, discount} = cabinData;
 
-  const {name,maxCapacity,regularPrice,image,discount,} = cabinData;
+  const queryClient = useQueryClient();
+
+  const {isLoading: isDeleting, mutate} = useMutation({
+    // mutationFn:(id) => deleteCabin(id),
+    mutationFn: deleteCabin,
+
+    onSuccess:()=>{
+      toast.success('cabin successfully deleted')
+      queryClient.invalidateQueries({
+        queryKey:["cabin"]
+      })
+    },
+
+   onError: (err) => toast.error(err.message,),
+  })
   return (
+    <>
     <TableRow role="row">
       <img src={image} alt="cabin-image" />
       <Cabin>{name}</Cabin>
       <div>Fits up to {maxCapacity} guests</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      <Delete>Delete</Delete>
+    
+      <div>
+        <button onClick={()=>setShowForm((show)=>!show)}>Edit</button>
+        <Delete 
+        onClick={() => mutate(cabinId)} 
+        disabled={isDeleting}
+        >
+        Delete
+      </Delete>
+      </div>
     </TableRow>
+
+    {showForm && <CreateCabinForm  cabinToEdit ={cabin}/>}
+        </>
   )
 }

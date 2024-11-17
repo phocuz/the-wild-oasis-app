@@ -1,11 +1,12 @@
 //import React from 'react'
 import styled from "styled-components";
 import {formatCurrency} from "../../utils/helpers"
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCabin } from "../../services/apiCabins";
-import toast from "react-hot-toast";
 import { useState } from "react";
 import CreateCabinForm from "./CreateCabinForm";
+import useDeleteCabins from "./useDeleteCabins";
+import { HiPencil, HiTrash } from "react-icons/hi";
+import { HiSquare2Stack } from "react-icons/hi2";
+import useCreateCabin from "./useCreateCabin";
 
 const TableRow = styled.div`
   display: grid;
@@ -45,53 +46,56 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
-const Delete = styled.button`
-  background-color: var(--color-grey-200);
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
+// const Delete = styled.button`
+//   background-color: var(--color-grey-200);
+//   padding: 8px;
+//   text-align: center;
+//   cursor: pointer;
 
-`
 
 export default function CabinRow({cabin}) {
 
+
   const [showForm, setShowForm] = useState(false)
+  const {isDeleting, deleteCabin} = useDeleteCabins()
+  const {isCreating,createCabin} = useCreateCabin();
+
   const cabinData = cabin;
-  // console.log('Cabin data:', cabin);
-  const {name, maxCapacity, id:cabinId, regularPrice, image, discount} = cabinData;
+  const {name, maxCapacity, id:cabinId, regularPrice, image, discount,description} = cabinData;
 
-  const queryClient = useQueryClient();
+  function handleDuplicate() {
+  const duplicateData={
+    name: `copy of ${name}`,
+    maxCapacity,
+    regularPrice,
+    image,
+    discount,
+    description,
+  };
 
-  const {isLoading: isDeleting, mutate} = useMutation({
-    // mutationFn:(id) => deleteCabin(id),
-    mutationFn: deleteCabin,
+   console.log("Duplicating cabin:", duplicateData); // Debug log
+  createCabin(duplicateData);
+}
 
-    onSuccess:()=>{
-      toast.success('cabin successfully deleted')
-      queryClient.invalidateQueries({
-        queryKey:["cabin"]
-      })
-    },
-
-   onError: (err) => toast.error(err.message,),
-  })
   return (
     <>
     <TableRow role="row">
-      <img src={image} alt="cabin-image" />
+      <Img src={image} alt="cabin-image" />
       <Cabin>{name}</Cabin>
       <div>Fits up to {maxCapacity} guests</div>
       <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
+      {discount ? (<Discount>{formatCurrency(discount)}</Discount>) :
+      (<span>&mdash;</span>)}
     
       <div>
-        <button onClick={()=>setShowForm((show)=>!show)}>Edit</button>
-        <Delete 
-        onClick={() => mutate(cabinId)} 
+        <button onClick={handleDuplicate} disabled={isCreating}><HiSquare2Stack /></button>
+        <button onClick={()=>setShowForm((show)=>!show)}><HiPencil /></button>
+        <button 
+        onClick={() => deleteCabin(cabinId)} 
         disabled={isDeleting}
         >
-        Delete
-      </Delete>
+        <HiTrash />
+      </button>
       </div>
     </TableRow>
 

@@ -1,3 +1,4 @@
+import { createContext, useContext } from "react";
 import styled from "styled-components";
 
 const StyledTable = styled.div`
@@ -58,3 +59,27 @@ const Empty = styled.p`
   text-align: center;
   margin: 2.4rem;
 `;
+
+const TableContext = createContext();
+function Table({columns,children}){
+
+  return (
+    <TableContext.Provider>
+    <StyledTable role="table">{children}</StyledTable>
+    </TableContext.Provider>
+    );
+  
+}
+
+function Header ({children}){
+
+}
+function Row({children}){
+
+}
+
+Table.Header = Header;
+Table.Bodt = Body;
+Table.Row = Row;
+Table.Footer
+export default Table;

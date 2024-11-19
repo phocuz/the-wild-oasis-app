@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import useEditCabin from "./useEditCabin";
 
 const FormRow = styled.div`
+
   display: grid;
   align-items: center;
   grid-template-columns: 24rem 1fr 1.2fr;
@@ -47,7 +48,7 @@ const Error = styled.span`
   color: var(--color-red-700);
 `;
 
-function CreateCabinForm({cabinToEdit ={}}) {
+function CreateCabinForm({cabinToEdit ={}, onCloseModal}) {
 
 
   const {id: editId, ...editValues} = cabinToEdit;
@@ -80,11 +81,17 @@ function CreateCabinForm({cabinToEdit ={}}) {
     const image =data.image? (typeof data.image === 'string'? data.image : data.image[0]) : null;
 
       if(isEditSession) editCabin({newCabinData: {...data, image}, id: editId},{
-          onSuccess: ()=> reset(),
+          onSuccess: ()=>{
+             reset(),
+             onCloseModal?.()
+            }
       });
       else createCabin({...data,image},
         {
-          onSuccess: ()=> reset(),
+          onSuccess: ()=> {
+            reset(),
+          onCloseModal?.()
+        }
       });
   }
 
@@ -92,7 +99,9 @@ function CreateCabinForm({cabinToEdit ={}}) {
     console.log(error)
   }
   return (
-    <Form onSubmit={handleSubmit(onSubmit, onError)}>
+    <Form 
+    onSubmit={handleSubmit(onSubmit, onError)}
+    type ={onCloseModal ? "modal" :"regular"} >
       <FormRow>
         <Label htmlFor="name">Cabin name</Label>
         <Input type="text" id="name" disabled={isWorking} {...register("name", {
@@ -156,7 +165,7 @@ function CreateCabinForm({cabinToEdit ={}}) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        <Button variation="secondary" type="reset" onClick={() => onCloseModal?.()}>
           Cancel
         </Button>
         <Button disabled={isWorking}>{isEditSession ? 'Edit cabin' : "Add new Cabin"}</Button>

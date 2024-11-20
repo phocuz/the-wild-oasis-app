@@ -61,25 +61,42 @@ const Empty = styled.p`
 `;
 
 const TableContext = createContext();
-function Table({columns,children}){
 
+
+function Table({ column, children }) {
   return (
-    <TableContext.Provider>
-    <StyledTable role="table">{children}</StyledTable>
+    <TableContext.Provider value={{ column }}>
+      <StyledTable role="table">{children}</StyledTable>
     </TableContext.Provider>
-    );
-  
+  );
 }
 
-function Header ({children}){
-
+function Header({ children }) {
+  const { column } = useContext(TableContext);
+  return (
+    <StyledHeader role="row" columns={column}>
+      {children}
+    </StyledHeader>
+  );
 }
-function Row({children}){
 
+function Row({ children }) {
+  const { column } = useContext(TableContext);
+  return (
+    <StyledRow role="row" columns={column}>
+      {children}
+    </StyledRow>
+  );
+}
+
+function Body({ data, render }) {
+  if (!DataTransfer.length) return <Empty>No data to show at the moment</Empty>
+  return <StyledBody>{data.map(render)}</StyledBody>;
 }
 
 Table.Header = Header;
-Table.Bodt = Body;
+Table.Body = Body;
 Table.Row = Row;
-Table.Footer
+Table.Footer = Footer;
+
 export default Table;

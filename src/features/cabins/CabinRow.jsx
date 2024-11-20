@@ -1,4 +1,4 @@
-//import React from 'react'
+
 import styled from "styled-components";
 import {formatCurrency} from "../../utils/helpers"
 import CreateCabinForm from "./CreateCabinForm";
@@ -9,17 +9,7 @@ import useCreateCabin from "./useCreateCabin";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete"
 import Table from "../../ui/Table";
-const TableRow = styled.div`
-  display: grid;
-  grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-  column-gap: 2.4rem;
-  align-items: center;
-  padding: 1.4rem 2.4rem;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid var(--color-grey-100);
-  }
-`;
+import Menus from "../../ui/Menus";
 
 const Img = styled.img`
   display: block;
@@ -47,11 +37,6 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
-// const Delete = styled.button`
-//   background-color: var(--color-grey-200);
-//   padding: 8px;
-//   text-align: center;
-//   cursor: pointer;
 
 
 export default function CabinRow({cabin}) {
@@ -78,7 +63,7 @@ export default function CabinRow({cabin}) {
 
   return (
     <>
-    <Table columns = '0.6fr 1.8fr 2.2fr 1fr 1fr 1fr'>
+    <Table.Row>
       <Img src={image} alt="cabin-image" />
       <Cabin>{name}</Cabin>
       <div>Fits up to {maxCapacity} guests</div>
@@ -109,8 +94,17 @@ export default function CabinRow({cabin}) {
           onConfirm={()=> deleteCabin(cabinId)} />
         </Modal.Window>
         </Modal>
+
+      <Menus.Menu>
+      <Menus.Toggle id={cabinId} />
+      <Menus.List id={cabinId}>
+        <Menus.Button icon={<HiSquare2Stack />}>Duplicate</Menus.Button>
+        <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+        <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+      </Menus.List>
+      </Menus.Menu>
       </div>
-    </Table>
+    </Table.Row>
         </>
   )
 }
